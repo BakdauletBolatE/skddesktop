@@ -6,20 +6,6 @@ import threading
 from tast_manager import Task
 import sqlite3
 
-
-class function1(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-
-    def job(self):
-        print("Работаю")
-
-    def run(self):
-        schedule.every(1).minutes.do(self.job)
-        while True:
-            time.sleep(1)
-            schedule.run_pending()
-
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
@@ -38,7 +24,7 @@ if __name__ == '__main__':
                 """)
         conn.commit()
     except sqlite3.OperationalError:
-        print('Уже сущетвует')
+        print('Hello')
  
 
     albums = [('Exodus', 'Andy Hunter', '7/9/2002', 'Sparrow Records', 'CD'),
