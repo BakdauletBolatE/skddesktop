@@ -23,13 +23,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         # Обязательно нужно вызвать метод супер класса
         QMainWindow.__init__(self)
-        self.con = sqlite3.connect("mydb.db") 
+        self.con = sqlite3.connect("mydb.db",check_same_thread=False) 
         self.cursor = self.con.cursor()
         self.perco = Perco()
         self.aonit = IntegrationAonit()
         
         self.setMinimumSize(QSize(800, 400))             # Устанавливаем размеры
-        self.setWindowTitle("Работа с QTableWidget")    # Устанавливаем заголовок окна
+        self.setWindowTitle("Приложение Интеграций")    # Устанавливаем заголовок окна
         central_widget = QWidget(self)                  # Создаём центральный виджет
         self.setCentralWidget(central_widget)           # Устанавливаем центральный виджет
         grid_layout = QGridLayout()             # Создаём QGridLayout
@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         
 
     def collectData(self):
-            self.cursor.execute("SELECT * FROM events;")
+            self.cursor.execute("SELECT * FROM events ORDER BY created_at DESC;")
             events = self.cursor.fetchall()
             self.cursor.execute("SELECT * FROM responses;")
             responses = self.cursor.fetchall()
@@ -140,8 +140,11 @@ if __name__ == "__main__":
     
     app = QApplication(sys.argv)
     mw = MainWindow()
-    Task().start()
+    task = Task(1)
+    task.start()
     mw.start()
     mw.show()
-    
-    sys.exit(app.exec())
+    def closeApp():
+        app.exec()
+        task.done()
+    sys.exit(closeApp())

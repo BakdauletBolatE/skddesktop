@@ -11,10 +11,10 @@ class IntegrationAonit():
 
     def __init__(self):
         self.login = 'SKUDUZHSHYM'
-        self.password = '123456uzhtest'
-        self.con = sqlite3.connect("mydb.db") 
+        self.password = '123456uzhprod'
+        self.con = sqlite3.connect("mydb.db",check_same_thread=False) 
         self.cursor = self.con.cursor()
-        self.url = 'http://10.245.12.67:9012/bip-sync/?wsdl'
+        self.url = 'http://10.245.12.102:80/bip-sync/?wsdl'
         self.headers = {'content-type': 'application/soap+xml; charset=utf-8'}
         self.dateToBody = arrow.get(datetime.now())
 
@@ -24,6 +24,7 @@ class IntegrationAonit():
             dateString = f'{today.day}.{today.month}.{today.year}'
             self.cursor.execute("SELECT * FROM events WHERE created_at = ?;",(todayday,))
             events = self.cursor.fetchall()
+          
             def iinIterable():
                 string = ''
                 for event in events:
@@ -128,16 +129,18 @@ class IntegrationAonit():
         
             body = body.encode('utf-8')
             response = requests.post(self.url,data=body, headers=self.headers)
-
+            responseTurple = ""
             if response.status_code == 200:
                 responseTurple = (response.status_code, response.text,todayday)
                 self.cursor.execute("INSERT INTO responses VALUES (NULL,?,?,?)", responseTurple)
                 self.con.commit()
+              
                 print(f'Сообщение успешно отправлено КОД:{response.status_code}')
                 print(response.text)
             else:
                 self.cursor.execute("INSERT INTO responses VALUES (NULL,?,?,?)", responseTurple)
                 self.con.commit()
+               
                 print(response.text)
                 print(f'Есть ошибка КОД:{response.status_code}')
             return 200
